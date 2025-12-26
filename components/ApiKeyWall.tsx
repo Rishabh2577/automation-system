@@ -22,7 +22,7 @@ const ApiKeyWall: React.FC<ApiKeyWallProps> = ({ onKeySelected }) => {
         </div>
         <h2 className="text-3xl font-bold gradient-text">Secure Access Required</h2>
         <p className="text-gray-400 text-sm leading-relaxed">
-          To generate high-fidelity cinematic videos using Veo 3, you must select a valid API key from a paid Google Cloud project.
+          To generate high-fidelity cinematic videos, you must select a valid API key from a paid Google Cloud project.
         </p>
         <div className="space-y-4 pt-4">
           <button

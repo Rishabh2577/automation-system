@@ -33,7 +33,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message }) => {
       </div>
       
       <p className="text-xs text-gray-600 max-w-xs">
-        Note: Veo generation can take 2-3 minutes. Please keep this tab open.
+        Note: Video generation can take 2-3 minutes. Please keep this tab open.
       </p>
     </div>
   );

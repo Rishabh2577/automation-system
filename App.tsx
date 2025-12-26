@@ -1,12 +1,34 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { CredentialResponse } from '@react-oauth/google';
 import { GenerationState, GenerationStatus, ProductImage, AspectRatio } from './types';
 import { generateProductVideo } from './services/geminiService';
 import ApiKeyWall from './components/ApiKeyWall';
 import ImageUploader from './components/ImageUploader';
 import LoadingScreen from './components/LoadingScreen';
+import GoogleLoginButton from './components/GoogleLoginButton';
 
+interface UserInfo {
+  email: string;
+  name: string;
+  picture?: string;
+}
+
+/**
+ * Main App Component with Google Authentication
+ * 
+ * Authentication Flow:
+ * 1. Check if user is already logged in (from localStorage)
+ * 2. If not → Show Google Login button
+ * 3. User clicks "Login with Google"
+ * 4. Google handles authentication (account selection or full login)
+ * 5. On success → Extract user info, save to state & localStorage
+ * 6. User can access the app
+ * 7. Logout clears session
+ */
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [hasKey, setHasKey] = useState<boolean | null>(null);
   const [images, setImages] = useState<ProductImage[]>([]);
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('16:9');
@@ -16,20 +38,91 @@ const App: React.FC = () => {
     progressMessage: ''
   });
 
+  // Check if user is already logged in on app load
   useEffect(() => {
-    const checkKey = async () => {
-      const exists = await window.aistudio.hasSelectedApiKey();
-      setHasKey(exists);
-    };
-    checkKey();
+    const savedUser = localStorage.getItem('google_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setUserInfo(user);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Failed to parse saved user', error);
+        localStorage.removeItem('google_user');
+      }
+    }
   }, []);
+
+  // Check API key when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const checkKey = async () => {
+        const exists = await window.aistudio.hasSelectedApiKey();
+        setHasKey(exists);
+      };
+      checkKey();
+    }
+  }, [isAuthenticated]);
+
+  /**
+   * Handle successful Google login
+   * Extracts user info from JWT token and saves session
+   */
+  const handleGoogleLoginSuccess = (credentialResponse: CredentialResponse) => {
+    try {
+      if (!credentialResponse.credential) {
+        console.error('No credential received');
+        return;
+      }
+
+      // Decode JWT token to extract user info
+      const token = credentialResponse.credential;
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+
+      const payload = JSON.parse(jsonPayload);
+      
+      // Extract user information
+      const user: UserInfo = {
+        email: payload.email || '',
+        name: payload.name || '',
+        picture: payload.picture || undefined,
+      };
+
+      // Save to state and localStorage
+      setUserInfo(user);
+      setIsAuthenticated(true);
+      localStorage.setItem('google_user', JSON.stringify(user));
+
+      console.log('✅ Google login successful:', user.email);
+    } catch (error) {
+      console.error('❌ Failed to process Google login:', error);
+    }
+  };
+
+  /**
+   * Handle logout
+   * Clears session and redirects to login
+   */
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserInfo(null);
+    localStorage.removeItem('google_user');
+    console.log('✅ Logged out successfully');
+  };
 
   const handleStartGeneration = useCallback(async () => {
     if (images.length === 0) return;
 
     setState({
       status: GenerationStatus.GENERATING,
-      progressMessage: 'Initializing Veo 3 Engine...'
+      progressMessage: 'Initializing Video Generation Engine...'
     });
 
     try {
@@ -56,6 +149,12 @@ const App: React.FC = () => {
     }
   }, [images, aspectRatio]);
 
+  // Show Google Login if not authenticated
+  if (!isAuthenticated) {
+    return <GoogleLoginButton onLoginSuccess={handleGoogleLoginSuccess} />;
+  }
+
+  // Show API Key wall if needed
   if (hasKey === false) {
     return <ApiKeyWall onKeySelected={() => setHasKey(true)} />;
   }
@@ -76,10 +175,34 @@ const App: React.FC = () => {
       )}
 
       <main className="w-full max-w-4xl relative z-10 space-y-16">
-        <header className="text-center space-y-6">
+        <header className="text-center space-y-6 relative">
+          {/* User info and logout button */}
+          <div className="absolute top-0 right-0 flex items-center gap-3">
+            {userInfo && (
+              <>
+                {userInfo.picture && (
+                  <img 
+                    src={userInfo.picture} 
+                    alt={userInfo.name}
+                    className="w-8 h-8 rounded-full border-2 border-white/20"
+                  />
+                )}
+                <span className="text-sm text-gray-400 hidden md:block">
+                  {userInfo.name}
+                </span>
+              </>
+            )}
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 glass text-white text-sm font-medium rounded-xl hover:bg-white/10 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 mb-2 border border-white/10">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            Veo 3 High-Fidelity Pipeline
+            High-Fidelity Pipeline
           </div>
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter gradient-text">
             Studio Pro
