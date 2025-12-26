@@ -29,7 +29,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ onLoginSuccess })
 
         {/* Title */}
         <div>
-          <h2 className="text-3xl font-bold gradient-text mb-2">Welcome to Studio Pro</h2>
+          <h2 className="text-3xl font-bold gradient-text mb-2">Welcome to GFT Studio +</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Sign in with your Google account to access cinematic product showcase
           </p>

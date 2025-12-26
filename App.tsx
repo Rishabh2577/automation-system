@@ -7,6 +7,7 @@ import ApiKeyWall from './components/ApiKeyWall';
 import ImageUploader from './components/ImageUploader';
 import LoadingScreen from './components/LoadingScreen';
 import GoogleLoginButton from './components/GoogleLoginButton';
+import { UserMenu } from './components/UserMenu';
 
 interface UserInfo {
   email: string;
@@ -174,41 +175,20 @@ const App: React.FC = () => {
         <LoadingScreen message={state.progressMessage} />
       )}
 
-      <main className="w-full max-w-4xl relative z-10 space-y-16">
-        <header className="text-center space-y-6 relative">
-          {/* User info and logout button */}
-          <div className="absolute top-0 right-0 flex items-center gap-3">
-            {userInfo && (
-              <>
-                {userInfo.picture && (
-                  <img 
-                    src={userInfo.picture} 
-                    alt={userInfo.name}
-                    className="w-8 h-8 rounded-full border-2 border-white/20"
-                  />
-                )}
-                <span className="text-sm text-gray-400 hidden md:block">
-                  {userInfo.name}
-                </span>
-              </>
-            )}
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 glass text-white text-sm font-medium rounded-xl hover:bg-white/10 transition-colors"
-            >
-              Logout
-            </button>
-          </div>
+      {/* User Menu - Fixed to top-right */}
+      {userInfo && (
+        <div className="fixed top-6 right-6 z-50">
+          <UserMenu userInfo={userInfo} onLogout={handleLogout} />
+        </div>
+      )}
 
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 mb-2 border border-white/10">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            High-Fidelity Pipeline
-          </div>
+      <main className="w-full max-w-4xl relative z-10 space-y-16">
+        <header className="text-center space-y-6">
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter gradient-text">
-            Studio Pro
+            GFT Studio +
           </h1>
           <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light">
-            Turn static product angles into high-end cinematic commercials. <br className="hidden md:block" />
+            Turn static product images into high-end cinematic commercials. <br className="hidden md:block" />
             3D reconstruction. Studio lighting. Professional motion.
           </p>
         </header>
@@ -359,20 +339,6 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <footer className="pt-16 pb-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-gray-600 text-[10px] uppercase tracking-[0.3em] font-bold">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-40"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-            Neural Reconstruction Active
-          </div>
-          <div className="flex gap-10">
-            <span>Volumetric 3D</span>
-            <span>Raytraced Shadows</span>
-            <span>Studio Master</span>
-          </div>
-        </footer>
       </main>
     </div>
   );

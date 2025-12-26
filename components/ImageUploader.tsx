@@ -53,7 +53,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages }) => {
             <svg className="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
             </svg>
-            <span className="text-[10px] font-bold uppercase tracking-tighter">Add Angle</span>
+            <span className="text-[10px] font-bold uppercase tracking-tighter">Add Images</span>
           </button>
         )}
       </div>
@@ -69,7 +69,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, setImages }) => {
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        Upload up to 5 angles (Front, Side, Back, Top, Details)
+        Upload up to 5 images ( ex: Front, Side, Back, Top, Details )
       </div>
     </div>
   );

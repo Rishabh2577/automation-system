@@ -16,7 +16,7 @@ Open: **https://console.cloud.google.com/**
 
 - Click "Select a project" (top left)
 - Click "NEW PROJECT"
-- Name it: "Studio Pro" (or anything you want)
+- Name it: "GFT Studio +" (or anything you want)
 - Click "Create"
 
 ### 3️⃣ Enable Google+ API
@@ -33,13 +33,13 @@ Open: **https://console.cloud.google.com/**
 - Select: **OAuth client ID**
 - If asked, configure consent screen:
   - User Type: **External**
-  - App name: **Studio Pro**
+  - App name: **GFT Studio +**
   - User support email: your email
   - Developer contact: your email
   - Save and Continue → Save and Continue → Save and Continue
 - Back to Create OAuth client ID:
   - Application type: **Web application**
-  - Name: **Studio Pro Web Client**
+  - Name: **GFT Studio + Web Client**
   - **Authorized JavaScript origins** → Add URIs:
     - `http://localhost:3000`
     - `http://localhost:5173`

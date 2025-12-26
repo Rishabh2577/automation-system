@@ -1,4 +1,4 @@
-# 🎬 Studio Pro - Cinematic Product Showcase
+# 🎬 GFT Studio + - Cinematic Product Showcase
 
 Transform static product images into high-end cinematic videos with AI-powered 3D reconstruction and professional motion.
 

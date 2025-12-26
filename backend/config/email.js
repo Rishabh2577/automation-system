@@ -21,10 +21,10 @@ const sendVerificationEmail = async (email, token, firstName) => {
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
-    subject: 'Verify Your Email - Studio Pro',
+    subject: 'Verify Your Email - GFT Studio +',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Welcome to Studio Pro, ${firstName}!</h2>
+        <h2>Welcome to GFT Studio +, ${firstName}!</h2>
         <p>Thank you for registering. Please verify your email address to activate your account.</p>
         <a href="${verificationUrl}" 
            style="display: inline-block; padding: 12px 24px; background-color: #000; color: #fff; text-decoration: none; border-radius: 5px; margin: 20px 0;">
@@ -57,7 +57,7 @@ const sendPasswordResetEmail = async (email, token, firstName) => {
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
-    subject: 'Reset Your Password - Studio Pro',
+    subject: 'Reset Your Password - GFT Studio +',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Password Reset Request</h2>
