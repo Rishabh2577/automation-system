@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../config/database');
-const { sendVerificationEmail, sendPasswordResetEmail } = require('../config/email');
+// const { sendVerificationEmail, sendPasswordResetEmail } = require('../config/email'); // Temporarily disabled
 require('dotenv').config();
 
 /**
@@ -86,13 +86,14 @@ exports.register = async (req, res) => {
       [firstName, lastName, username, email, passwordHash, verificationToken]
     );
 
-    // Send verification email
-    try {
-      await sendVerificationEmail(email, verificationToken, firstName);
-    } catch (emailError) {
-      console.error('Email send error:', emailError);
-      // Continue even if email fails - user is registered
-    }
+    // Send verification email (temporarily disabled)
+    // try {
+    //   await sendVerificationEmail(email, verificationToken, firstName);
+    // } catch (emailError) {
+    //   console.error('Email send error:', emailError);
+    //   // Continue even if email fails - user is registered
+    // }
+    console.log('Email verification disabled - token:', verificationToken);
 
     res.status(201).json({
       success: true,
@@ -276,12 +277,13 @@ exports.forgotPassword = async (req, res) => {
       [resetToken, resetExpires, user.id]
     );
 
-    // Send reset email
-    try {
-      await sendPasswordResetEmail(user.email, resetToken, user.first_name);
-    } catch (emailError) {
-      console.error('Password reset email error:', emailError);
-    }
+    // Send reset email (temporarily disabled)
+    // try {
+    //   await sendPasswordResetEmail(user.email, resetToken, user.first_name);
+    // } catch (emailError) {
+    //   console.error('Password reset email error:', emailError);
+    // }
+    console.log('Password reset email disabled - token:', resetToken);
 
     res.json({
       success: true,
