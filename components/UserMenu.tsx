@@ -77,7 +77,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ userInfo, onLogout }) => {
         aria-label="User menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="w-10 h-10 rounded-full border-2 border-white/20 hover:border-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black overflow-hidden"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/20 hover:border-white/40 transition-all focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black overflow-hidden"
       >
         {userInfo.picture ? (
           <img 
@@ -96,29 +96,29 @@ export const UserMenu: React.FC<UserMenuProps> = ({ userInfo, onLogout }) => {
       {isOpen && (
         <div
           ref={menuRef}
-          className="absolute top-full right-0 mt-2 w-64 glass rounded-2xl border border-white/10 shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute top-full right-0 mt-2 w-56 sm:w-64 glass rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200"
           role="menu"
           aria-orientation="vertical"
         >
           {/* User Info Section */}
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
+          <div className="p-3 sm:p-4 border-b border-white/10">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               {userInfo.picture ? (
                 <img 
                   src={userInfo.picture} 
                   alt={userInfo.name}
-                  className="w-12 h-12 rounded-full border-2 border-white/20"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-white/20 flex-shrink-0"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm sm:text-base flex-shrink-0">
                   {getInitials(userInfo.name)}
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm truncate">
+                <p className="text-white font-medium text-xs sm:text-sm truncate">
                   {userInfo.name}
                 </p>
-                <p className="text-gray-400 text-xs truncate">
+                <p className="text-gray-400 text-[10px] sm:text-xs truncate">
                   {userInfo.email}
                 </p>
               </div>
@@ -126,14 +126,14 @@ export const UserMenu: React.FC<UserMenuProps> = ({ userInfo, onLogout }) => {
           </div>
 
           {/* Logout Button */}
-          <div className="p-2">
+          <div className="p-1.5 sm:p-2">
             <button
               onClick={handleLogoutClick}
               role="menuitem"
-              className="w-full px-4 py-2.5 text-left text-white text-sm font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center gap-3"
+              className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left text-white text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl hover:bg-white/10 transition-colors flex items-center gap-2 sm:gap-3"
             >
               <svg 
-                className="w-5 h-5 text-gray-400" 
+                className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
