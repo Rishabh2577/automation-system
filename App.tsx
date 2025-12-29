@@ -175,9 +175,9 @@ const App: React.FC = () => {
         <LoadingScreen message={state.progressMessage} />
       )}
 
-      {/* User Menu - Scrolls with page */}
+      {/* User Menu - Fixed to top-right */}
       {userInfo && (
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
           <UserMenu userInfo={userInfo} onLogout={handleLogout} />
         </div>
       )}
@@ -214,7 +214,7 @@ const App: React.FC = () => {
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Download Master
+                Download Video
               </a>
               <button
                 onClick={() => {
@@ -223,7 +223,7 @@ const App: React.FC = () => {
                 }}
                 className="px-6 sm:px-10 py-4 sm:py-5 glass text-white font-bold text-sm sm:text-base rounded-2xl hover:bg-white/10 active:scale-95 transition-all"
               >
-                Create New Edit
+                Create New Video
               </button>
             </div>
           </div>
