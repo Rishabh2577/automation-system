@@ -3,6 +3,7 @@ import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 interface GoogleLoginButtonProps {
   onLoginSuccess: (credentialResponse: CredentialResponse) => void;
+  onClose?: () => void;
 }
 
 /**
@@ -14,10 +15,23 @@ interface GoogleLoginButtonProps {
  * 3. Google handles authentication (same as before)
  * 4. Returns credentials to app
  */
-const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ onLoginSuccess }) => {
+const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ onLoginSuccess, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 sm:p-6">
-      <div className="max-w-md w-full glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-5 sm:space-y-6">
+      <div className="max-w-md w-full glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-5 sm:space-y-6 relative">
+        {/* Close Button */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-1"
+            aria-label="Close"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+
         {/* Icon */}
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto">
           <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

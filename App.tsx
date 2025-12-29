@@ -8,6 +8,7 @@ import ImageUploader from './components/ImageUploader';
 import LoadingScreen from './components/LoadingScreen';
 import GoogleLoginButton from './components/GoogleLoginButton';
 import { UserMenu } from './components/UserMenu';
+import AdminView from './components/AdminView';
 
 interface UserInfo {
   email: string;
@@ -38,6 +39,9 @@ const App: React.FC = () => {
     status: GenerationStatus.IDLE,
     progressMessage: ''
   });
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const [pendingDownloadUrl, setPendingDownloadUrl] = useState<string | null>(null);
+  const [showAdminView, setShowAdminView] = useState<boolean>(false);
 
   // Check if user is already logged in on app load
   useEffect(() => {
@@ -54,16 +58,28 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Check API key when authenticated
+  // Check API key on mount (no auth required)
   useEffect(() => {
-    if (isAuthenticated) {
-      const checkKey = async () => {
-        const exists = await window.aistudio.hasSelectedApiKey();
-        setHasKey(exists);
-      };
-      checkKey();
-    }
-  }, [isAuthenticated]);
+    const checkKey = async () => {
+      const exists = await window.aistudio.hasSelectedApiKey();
+      setHasKey(exists);
+    };
+    checkKey();
+  }, []);
+
+  // Admin view keyboard shortcut (Ctrl+Shift+A)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        setShowAdminView(prev => !prev);
+        console.log('🔐 Admin view toggled');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   /**
    * Handle successful Google login
@@ -102,6 +118,15 @@ const App: React.FC = () => {
       localStorage.setItem('google_user', JSON.stringify(user));
 
       console.log('✅ Google login successful:', user.email);
+
+      // Close login modal
+      setShowLoginModal(false);
+
+      // If there's a pending download, trigger it now
+      if (pendingDownloadUrl) {
+        handleDownload(pendingDownloadUrl, user);
+        setPendingDownloadUrl(null);
+      }
     } catch (error) {
       console.error('❌ Failed to process Google login:', error);
     }
@@ -117,6 +142,60 @@ const App: React.FC = () => {
     localStorage.removeItem('google_user');
     console.log('✅ Logged out successfully');
   };
+
+  /**
+   * Track user activity (generation or download)
+   */
+  const trackActivity = useCallback((action: 'generation' | 'download', videoUrl?: string) => {
+    const activity = {
+      action,
+      timestamp: new Date().toISOString(),
+      user: userInfo || { email: 'anonymous', name: 'Anonymous User' },
+      aspectRatio,
+      imageCount: images.length,
+      videoUrl: videoUrl || state.videoUrl
+    };
+
+    // Save to localStorage for now (can be sent to backend later)
+    const existingHistory = JSON.parse(localStorage.getItem('user_activity_history') || '[]');
+    existingHistory.push(activity);
+    localStorage.setItem('user_activity_history', JSON.stringify(existingHistory));
+
+    console.log('📊 Activity tracked:', activity);
+  }, [userInfo, aspectRatio, images.length, state.videoUrl]);
+
+  /**
+   * Handle download with auth gate
+   */
+  const handleDownloadClick = useCallback((videoUrl: string) => {
+    if (!isAuthenticated) {
+      // User not logged in - show login modal and queue download
+      setPendingDownloadUrl(videoUrl);
+      setShowLoginModal(true);
+      console.log('🔒 Login required for download');
+    } else {
+      // User logged in - proceed with download
+      handleDownload(videoUrl, userInfo!);
+    }
+  }, [isAuthenticated, userInfo]);
+
+  /**
+   * Actual download execution
+   */
+  const handleDownload = useCallback((videoUrl: string, user: UserInfo) => {
+    // Track download activity
+    trackActivity('download', videoUrl);
+
+    // Trigger download
+    const link = document.createElement('a');
+    link.href = videoUrl;
+    link.download = 'product_master.mp4';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    console.log('✅ Download started for:', user.email);
+  }, [trackActivity]);
 
   const handleStartGeneration = useCallback(async () => {
     if (images.length === 0) return;
@@ -135,6 +214,9 @@ const App: React.FC = () => {
         progressMessage: '',
         videoUrl
       });
+
+      // Track generation activity (works for anonymous users too)
+      trackActivity('generation', videoUrl);
     } catch (err: any) {
       console.error(err);
       if (err.message === "API_KEY_RESET_REQUIRED") {
@@ -148,14 +230,14 @@ const App: React.FC = () => {
         });
       }
     }
-  }, [images, aspectRatio]);
+  }, [images, aspectRatio, trackActivity]);
 
-  // Show Google Login if not authenticated
-  if (!isAuthenticated) {
-    return <GoogleLoginButton onLoginSuccess={handleGoogleLoginSuccess} />;
+  // Show Admin View if toggled (Ctrl+Shift+A)
+  if (showAdminView) {
+    return <AdminView />;
   }
 
-  // Show API Key wall if needed
+  // Show API Key wall if needed (no auth required)
   if (hasKey === false) {
     return <ApiKeyWall onKeySelected={() => setHasKey(true)} />;
   }
@@ -175,7 +257,18 @@ const App: React.FC = () => {
         <LoadingScreen message={state.progressMessage} />
       )}
 
-      {/* User Menu - Fixed to top-right */}
+      {/* Optional Login Modal - shown when download requires auth */}
+      {showLoginModal && (
+        <GoogleLoginButton 
+          onLoginSuccess={handleGoogleLoginSuccess}
+          onClose={() => {
+            setShowLoginModal(false);
+            setPendingDownloadUrl(null);
+          }}
+        />
+      )}
+
+      {/* User Menu - Fixed to top-right (only shown after login) */}
       {userInfo && (
         <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
           <UserMenu userInfo={userInfo} onLogout={handleLogout} />
@@ -206,16 +299,15 @@ const App: React.FC = () => {
               />
             </div>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center px-2">
-              <a
-                href={state.videoUrl}
-                download="product_master.mp4"
+              <button
+                onClick={() => handleDownloadClick(state.videoUrl!)}
                 className="px-6 sm:px-10 py-4 sm:py-5 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 shadow-xl shadow-white/10"
               >
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Download Video
-              </a>
+              </button>
               <button
                 onClick={() => {
                   setState({ status: GenerationStatus.IDLE, progressMessage: '' });
