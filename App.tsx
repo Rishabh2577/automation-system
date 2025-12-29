@@ -317,7 +317,7 @@ const App: React.FC = () => {
                     <svg className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
                     </svg>
-                    <span className="truncate">Render Cinematic Master</span>
+                    <span className="truncate">Generate Video</span>
                   </>
                 ) : (
                   <span className="truncate">Upload Images to Start</span>
